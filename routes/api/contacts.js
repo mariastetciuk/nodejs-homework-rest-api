@@ -1,25 +1,43 @@
-const express = require('express')
+import express, { response } from 'express';
+import contactsService from '../../models/contacts.js';
+import { HttpError } from '../../helpers/index.js';
 
-const router = express.Router()
+const router = express.Router();
 
 router.get('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+  try {
+    const result = await contactsService.listContacts();
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+  try {
+    const { contactId } = req.params;
+    const result = await contactsService.getContactById(contactId);
+
+    if (!result) {
+      throw HttpError(404);
+    }
+
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.post('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+  res.json({ message: '123' });
+});
 
 router.delete('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+  res.json({ message: 'template message' });
+});
 
 router.put('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+  res.json({ message: 'template message' });
+});
 
-module.exports = router
+export default router;
