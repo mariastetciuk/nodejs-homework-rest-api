@@ -1,5 +1,5 @@
 import Contact from '../models/contact.js';
-// import { HttpError } from '../helpers/index.js';
+import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 
 const getAll = async (req, res) => {
@@ -45,10 +45,22 @@ const updateById = async (req, res) => {
   res.json(result);
 };
 
+const updateByFavorite = async (req, res) => {
+  const { contactId } = req.params;
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+  });
+  if (!result) {
+    throw HttpError(404);
+  }
+  res.json(result);
+};
+
 export default {
   getAll: ctrlWrapper(getAll),
   getById: ctrlWrapper(getById),
   add: ctrlWrapper(add),
   deleteById: ctrlWrapper(deleteById),
   updateById: ctrlWrapper(updateById),
+  updateByFavorite: ctrlWrapper(updateByFavorite),
 };
