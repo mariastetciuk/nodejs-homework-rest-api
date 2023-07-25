@@ -26,12 +26,13 @@ router.delete('/:contactId', isValidId, contactsControllers.deleteById);
 router.put(
   '/:contactId',
   isValidId,
+  validateBody(emptyBody),
   validateBody(contactsAdd),
   contactsControllers.updateById
 );
 
 router.patch(
-  '/:contactId',
+  '/:contactId/favorite',
   isValidId,
   validateBody(favoritContact),
   contactsControllers.updateByFavorite
