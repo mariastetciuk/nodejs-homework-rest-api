@@ -8,22 +8,22 @@ import {
 } from '../../schemas/contacts-schemas.js';
 import { isValidId } from '../../middlewares/index.js';
 
-const router = express.Router();
+const contactsRouter = express.Router();
 
-router.get('/', contactsControllers.getAll);
+contactsRouter.get('/', contactsControllers.getAll);
 
-router.get('/:contactId', isValidId, contactsControllers.getById);
+contactsRouter.get('/:contactId', isValidId, contactsControllers.getById);
 
-router.post(
+contactsRouter.post(
   '/',
   validateBody(emptyBody),
   validateBody(contactsAdd),
   contactsControllers.add
 );
 
-router.delete('/:contactId', isValidId, contactsControllers.deleteById);
+contactsRouter.delete('/:contactId', isValidId, contactsControllers.deleteById);
 
-router.put(
+contactsRouter.put(
   '/:contactId',
   isValidId,
   validateBody(emptyBody),
@@ -31,11 +31,11 @@ router.put(
   contactsControllers.updateById
 );
 
-router.patch(
+contactsRouter.patch(
   '/:contactId/favorite',
   isValidId,
   validateBody(favoritContact),
   contactsControllers.updateByFavorite
 );
 
-export default router;
+export default contactsRouter;
