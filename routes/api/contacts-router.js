@@ -6,9 +6,11 @@ import {
   contactsAdd,
   favoritContact,
 } from '../../schemas/contacts-schemas.js';
-import { isValidId } from '../../middlewares/index.js';
+import { isValidId, authenticate } from '../../middlewares/index.js';
 
 const contactsRouter = express.Router();
+
+contactsRouter.use(authenticate);
 
 contactsRouter.get('/', contactsControllers.getAll);
 
