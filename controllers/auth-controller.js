@@ -17,8 +17,10 @@ const signup = async (req, res) => {
   const newUser = await User.create({ ...req.body, password: hashPassword });
 
   res.status(201).json({
-    email: newUser.email,
-    subscription: 'starter',
+    user: {
+      email: newUser.email,
+      subscription: 'starter',
+    },
   });
 };
 
@@ -54,7 +56,7 @@ const signout = async (req, res) => {
   const { _id } = req.user;
   await User.findByIdAndUpdate(_id, { token: '' });
 
-  res.status(204);
+  res.status(204).json();
 };
 
 const getCurrent = (req, res) => {
@@ -63,9 +65,21 @@ const getCurrent = (req, res) => {
   res.json({ email, subscription });
 };
 
+const updateBysubscription = async (req, res) => {
+  const { _id } = req.user;
+  const result = await User.findByIdAndUpdate(_id, req.body, {
+    new: true,
+  });
+  if (!result) {
+    throw HttpError(404);
+  }
+  res.json(result);
+};
+
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
   signout: ctrlWrapper(signout),
   getCurrent: ctrlWrapper(getCurrent),
+  updateBysubscription: ctrlWrapper(updateBysubscription),
 };

@@ -28,4 +28,14 @@ const userSigninSchema = Joi.object({
   }),
 });
 
-export default { userSignupSchema, userSigninSchema };
+const userSubscriptionShema = Joi.object({
+  subscription: Joi.string()
+    .required()
+    .valid('starter', 'pro', 'business')
+    .messages({
+      'any.required': 'missing field subscription',
+      'valid.base': 'The value must be "starter" or "pro" or "business"',
+    }),
+});
+
+export default { userSignupSchema, userSigninSchema, userSubscriptionShema };
