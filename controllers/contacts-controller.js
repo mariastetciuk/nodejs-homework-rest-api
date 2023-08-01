@@ -3,7 +3,19 @@ import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 
 const getAll = async (req, res) => {
-  const result = await Contact.find();
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 20, favorite } = req.query;
+  const skip = (page - 1) * limit;
+
+  let query = { owner };
+  if (favorite) {
+    query.favorite = favorite === 'true';
+  }
+  const result = await Contact.find(query, '-createdAt -updatedAt', {
+    skip,
+    limit,
+  });
+
   res.json(result);
 };
 
@@ -19,7 +31,8 @@ const getById = async (req, res) => {
 };
 
 const add = async (req, res) => {
-  const result = await Contact.create(req.body);
+  const { _id: owner } = req.user;
+  const result = await Contact.create({ ...req.body, owner });
   res.status(201).json(result);
 };
 
