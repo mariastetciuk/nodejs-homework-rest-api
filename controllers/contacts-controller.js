@@ -55,7 +55,7 @@ const updateById = async (req, res) => {
   if (!result) {
     throw HttpError(404);
   }
-  res.json(result);
+  res.json({ avatarURL: result.avatarURL });
 };
 
 const updateByFavorite = async (req, res) => {

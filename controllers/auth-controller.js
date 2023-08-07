@@ -1,25 +1,38 @@
 import User from '../models/users.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import fs from 'fs/promises';
 import 'dotenv/config';
+import path from 'path';
+import Jimp from 'jimp';
+import gravatar from 'gravatar';
 import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 
 const { JWT_SECRET } = process.env;
 
+const avatarPath = path.resolve('public', 'avatars');
+
 const signup = async (req, res) => {
   const { email, password } = req.body;
+
   const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, 'Email in use');
   }
+  const avatarURL = gravatar.url(email, { s: '250', d: 'retro' });
   const hashPassword = await bcrypt.hash(password, 10);
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL,
+  });
 
   res.status(201).json({
     user: {
       email: newUser.email,
       subscription: 'starter',
+      avatarURL,
     },
   });
 };
@@ -76,10 +89,37 @@ const updateBysubscription = async (req, res) => {
   res.json(result);
 };
 
+const updataByAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: oldPath, filename } = req.file;
+
+  const image = await Jimp.read(oldPath);
+  image.resize(250, 250);
+  await image.writeAsync(oldPath);
+
+  const newPath = path.join(avatarPath, filename);
+  await fs.rename(oldPath, newPath);
+
+  const avatarURL = path.join('avatars', filename);
+  const result = await User.findByIdAndUpdate(
+    _id,
+    { avatarURL },
+    {
+      new: true,
+    }
+  );
+
+  if (!result) {
+    throw HttpError(404);
+  }
+  res.json({ avatarURL: result.avatarURL });
+};
+
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
   signout: ctrlWrapper(signout),
   getCurrent: ctrlWrapper(getCurrent),
   updateBysubscription: ctrlWrapper(updateBysubscription),
+  updataByAvatar: ctrlWrapper(updataByAvatar),
 };

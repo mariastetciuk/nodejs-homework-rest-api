@@ -2,13 +2,14 @@ import express from 'express';
 import { validateBody } from '../../decorators/index.js';
 import { emptyBody } from '../../schemas/contacts-schemas.js';
 import authSchemas from '../../schemas/auth-schemas.js';
-import { authenticate } from '../../middlewares/index.js';
+import { authenticate, upload } from '../../middlewares/index.js';
 import authController from '../../controllers/auth-controller.js';
 
 const authRouter = express.Router();
 
 authRouter.post(
   '/register',
+  upload.single('avatarURL'),
   validateBody(emptyBody),
   validateBody(authSchemas.userSignupSchema),
   authController.signup
@@ -30,6 +31,13 @@ authRouter.patch(
   authenticate,
   validateBody(authSchemas.userSubscriptionShema),
   authController.updateBysubscription
+);
+
+authRouter.patch(
+  '/avatars',
+  upload.single('avatarURL'),
+  authenticate,
+  authController.updataByAvatar
 );
 
 export default authRouter;
